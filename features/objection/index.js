@@ -2,8 +2,8 @@
 
 var _ = require('lodash')
   , Promise = require('bluebird')
-  , multiRequire = require('nails/lib/utils/multi-require')
-  , classUtils = require('nails/lib/utils/class-utils')
+  , multiRequire = require('dodo/lib/utils/multi-require')
+  , classUtils = require('dodo/lib/utils/class-utils')
   , Model = require('objection').Model
   , knex = require('knex')
   , color = require('cli-color');

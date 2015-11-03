@@ -1,7 +1,7 @@
 var _ = require('lodash')
   , Knex = require('knex')
   , Promise = require('bluebird')
-  , multiRequire = require('nails/lib/utils/multi-require');
+  , multiRequire = require('dodo/lib/utils/multi-require');
 
 /**
  * Base class for database managers.

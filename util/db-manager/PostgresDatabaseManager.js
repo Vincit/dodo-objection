@@ -2,7 +2,7 @@ var _ = require('lodash')
   , pg = require('pg')
   , escape = require('pg-escape')
   , Promise = require('bluebird')
-  , classUtils = require('nails/lib/utils/class-utils')
+  , classUtils = require('dodo/lib/utils/class-utils')
   , DatabaseManager = require('./DatabaseManager');
 
 /**
