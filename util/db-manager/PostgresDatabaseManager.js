@@ -67,8 +67,11 @@ PostgresDatabaseManager.prototype.truncateDb = function(databaseName) {
     if (!_.isEmpty(tableNames)) {
       return knex.raw('TRUNCATE TABLE "' + tableNames.join('","') + '" RESTART IDENTITY');
     }
-  }).finally(function() {
+  }).tap(function () {
     knex.destroy();
+  }).catch(function(err) {
+    knex.destroy();
+    throw err;
   });
 };
 
@@ -94,9 +97,13 @@ PostgresDatabaseManager.prototype.updateIdSequences = function(databaseName) {
 
     query = query.join(' UNION ALL ') + ';';
     return knex.raw(query);
-  }).finally(function() {
+  }).tap(function () {
     knex.destroy();
+  }).catch(function(err) {
+    knex.destroy();
+    throw err;
   });
+
 };
 
 /**

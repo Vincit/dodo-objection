@@ -97,8 +97,10 @@ DatabaseManager.prototype.populateDb = function(databaseName, populatePathPatter
     .all(_.map(modules, function (module) {
       return module.module(knex);
     }))
-    .finally(function () {
-      return knex.destroy();
+    .tap(function () { knex.destroy(); })
+    .catch(function(err) {
+      knex.destroy();
+      throw err;
     });
 };
 
@@ -110,9 +112,12 @@ DatabaseManager.prototype.populateDb = function(databaseName, populatePathPatter
  */
 DatabaseManager.prototype.migrateDb = function(databaseName) {
   var knex = this.knexInstance(databaseName);
-  return knex.migrate.latest().finally(function() {
-    knex.destroy();
-  });
+  return knex.migrate.latest()
+    .tap(function () { knex.destroy(); })
+    .catch(function(err) {
+      knex.destroy();
+      throw err;
+    });
 };
 
 /**
@@ -128,9 +133,12 @@ DatabaseManager.prototype.migrateDb = function(databaseName) {
  */
 DatabaseManager.prototype.dbVersion = function(databaseName) {
   var knex = this.knexInstance(databaseName);
-  return knex.migrate.currentVersion().finally(function() {
-    knex.destroy();
-  });
+  return knex.migrate.currentVersion()
+    .tap(function () { knex.destroy(); })
+    .catch(function(err) {
+      knex.destroy();
+      throw err;
+    });
 };
 
 /**
