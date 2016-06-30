@@ -33,6 +33,7 @@ var _ = require('lodash')
  *    express.js Application instance.
  */
 module.exports = function(app, config) {
+  var feature = this;
 
   /**
    * Check if configuration is actually `function (req)` and plain object and get configuration accordingly.
@@ -79,18 +80,28 @@ module.exports = function(app, config) {
    * @param {object} fakeReq If one have given objection configuration as
    *   `function (req)` in that case one has to give compatible req object to create connection.
    */
-  app.knex = function (fakeReq) {
+  feature.knex = function (fakeReq) {
     // Throws if the database configuration is request specific.
     // See ConfigManager.knexConfig for more info.
     return database(fakeReq);
   };
 
-  app.disconnectKnex = function () {
+  app.knex = function (fakeReq) {
+    log.warning("app.knex() API is going to be deprecated, please use app.feature('objection').knex()");
+    return feature.knex(fakeReq);
+  };
+
+  feature.disconnectKnex = function () {
     var dbs = databases;
     databases = {};
     return Promise.all(_.map(dbs, function (knex) {
       return knex.destroy();
     }));
+  };
+
+  app.disconnectKnex = function () {
+    log.warning("app.disconnectKnex() API is going to be deprecated, please use app.feature('objection').disconnectKnex()");
+    return feature.disconnectKnex();
   };
 
   // bind models...
@@ -102,10 +113,15 @@ module.exports = function(app, config) {
    * @param {object} fakeReq If one have given objection configuration as
    *   `function (req)` in that case one has to give compatible req object to create connection.
    */
-  app.models = function (fakeReq) {
+  feature.models = function (fakeReq) {
     // Throws if the database configuration is request specific.
     // See ConfigManager.knexConfig for more info.
     return bindModels(app.knex(fakeReq));
+  };
+
+  app.models = function (fakeReq) {
+    log.warning("app.models() API is going to be deprecated, please use app.feature('objection').models()");
+    return feature.model(fakeReq);
   };
 
   app.use(function(req, res, next) {
