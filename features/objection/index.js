@@ -6,7 +6,8 @@ var _ = require('lodash')
   , classUtils = require('dodo/lib/utils/class-utils')
   , Model = require('objection').Model
   , knex = require('knex')
-  , color = require('cli-color');
+  , color = require('cli-color')
+  , log = require('dodo/lib/logger').getLogger('dodo-objection.feature');
 
 /**
  * Registers an *Express* middleware that adds a *knex.js* database connection to each request.
@@ -234,7 +235,7 @@ function findModelClassModules(app, config) {
  * @private
  */
 function logModelClassFound(module) {
-  console.log('  '
+  log.info('  '
     + color.white('registering model class ')
     + color.cyan(module.fileName) + ' '
     + color.white('for database binding'));
