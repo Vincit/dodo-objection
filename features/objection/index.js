@@ -179,7 +179,7 @@ var configurePostgres = _.once(function () {
     var parsedSubSecond = parsedDateTime[4];
     var milliseconds = ".000";
     if (parsedSubSecond) {
-      milliseconds = parseFloat(parsedDateTime[3]).toPrecision(3).substring(1);
+      milliseconds = parseFloat(parsedDateTime[3]).toFixed(3).substring(1);
     }
 
     var parsedTimeZone = parsedDateTime[5];
