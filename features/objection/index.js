@@ -116,7 +116,7 @@ module.exports = function(app, config) {
   feature.models = function (fakeReq) {
     // Throws if the database configuration is request specific.
     // See ConfigManager.knexConfig for more info.
-    return bindModels(app.knex(fakeReq));
+    return bindModels(feature.knex(fakeReq));
   };
 
   app.models = function (fakeReq) {
