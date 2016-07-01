@@ -121,7 +121,7 @@ module.exports = function(app, config) {
 
   app.models = function (fakeReq) {
     log.warning("app.models() API is going to be deprecated, please use app.feature('objection').models()");
-    return feature.model(fakeReq);
+    return feature.models(fakeReq);
   };
 
   app.use(function(req, res, next) {
