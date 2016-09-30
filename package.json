@@ -12,6 +12,7 @@
     "bluebird": "^3.4.1",
     "cli-color": "^1.1.0",
     "color": "^0.10.1",
+    "knex-db-manager": "^0.1.0",
     "lodash": "^3.10.1",
     "pg-escape": "^0.1.0"
   },
