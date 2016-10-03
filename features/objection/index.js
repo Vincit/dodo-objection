@@ -7,7 +7,8 @@ var _ = require('lodash')
   , Model = require('objection').Model
   , knex = require('knex')
   , color = require('cli-color')
-  , log = require('dodo/lib/logger').getLogger('dodo-objection.feature');
+  , log = require('dodo/lib/logger').getLogger('dodo-objection.feature')
+  , createDbManager = require('knex-db-manager').databaseManagerFactory;
 
 /**
  * Registers an *Express* middleware that adds a *knex.js* database connection to each request.
@@ -18,10 +19,12 @@ var _ = require('lodash')
  * features: [
  *   ...
  *   {
- *     feature: 'objection'
- *     knex: { ... },
- *     dbManager: { ... }
- *     modelPaths: []
+ *     feature: 'objection',
+ *     config: {
+ *       knex: { ... },
+ *       dbManager: { ... },
+ *       modelPaths: []
+ *     }
  *   },
  *   ...
  * ]
@@ -57,6 +60,7 @@ module.exports = function(app, config) {
     }
   }
 
+  var databases = {};
   function database(req) {
     var knexConfig = getDbConfig(config, req).knex;
     var dbId = knexConfig.client
@@ -70,9 +74,27 @@ module.exports = function(app, config) {
     return databases[dbId];
   }
 
+  var dbManagers = {};
+  function dbManagerCache(req) {
+    var managerConfig = getDbConfig(config, req);
+    var knexConfig = managerConfig.knex;
+    var dbId = knexConfig.client
+      + '_' + knexConfig.connection.host
+      + '_' + knexConfig.connection.database;
+
+    if (!dbManagers[dbId]) {
+      dbManagers[dbId] = createDbManager(managerConfig);
+    }
+
+    return dbManagers[dbId];
+  }
+
   configurePostgres();
 
-  var databases = {};
+  // database manager for handling administration stuff...
+  feature.dbManager = function (fakeReq) {
+    return dbManagerCache(fakeReq);
+  }
 
   /**
    * Get database connection through app
@@ -86,26 +108,17 @@ module.exports = function(app, config) {
     return database(fakeReq);
   };
 
-  app.knex = function (fakeReq) {
-    log.warning("app.knex() API is going to be deprecated, please use app.feature('objection').knex()");
-    return feature.knex(fakeReq);
-  };
-
   feature.disconnectKnex = function () {
     var dbs = databases;
     databases = {};
+    // TODO: probably this should also destroy dbManager connections
     return Promise.all(_.map(dbs, function (knex) {
       return knex.destroy();
     }));
   };
 
-  app.disconnectKnex = function () {
-    log.warning("app.disconnectKnex() API is going to be deprecated, please use app.feature('objection').disconnectKnex()");
-    return feature.disconnectKnex();
-  };
-
   // bind models...
-  var modelModules = findModelClassModules(app, config);
+  var modelModules = findModelClassModules(app, getDbConfig(config, {}));
 
   /**
    * Get bound models through app
@@ -119,14 +132,10 @@ module.exports = function(app, config) {
     return bindModels(feature.knex(fakeReq));
   };
 
-  app.models = function (fakeReq) {
-    log.warning("app.models() API is going to be deprecated, please use app.feature('objection').models()");
-    return feature.models(fakeReq);
-  };
-
   app.use(function(req, res, next) {
-    req.knex = database(req);
-    req.models = bindModels(req.knex);
+    req.knex = feature.knex(req);
+    req.models = feature.models(req);
+    req.dbManager = feature.dbManager(req);
     next();
   });
 

@@ -1,7 +1,7 @@
 {
   "name": "dodo-objection",
   "description": "Objection.js ORM plugin for Dodo.js framework",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": false,
   "author": {
     "name": "Mikael Lepistö",
@@ -9,11 +9,10 @@
     "url": "https://github.com/elhigu"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
+    "bluebird": "^3.4.6",
     "cli-color": "^1.1.0",
-    "color": "^0.10.1",
-    "lodash": "^3.10.1",
-    "pg-escape": "^0.1.0"
+    "knex-db-manager": "^0.1.0",
+    "lodash": "^4.16.2"
   },
   "peerDependencies": {
     "objection": ">= 0.3.2 || ~0.4.0-0 || ~0.5.0-0  || ~0.6.0-0 || ~0.7.0-0 || ~0.8.0-0 || ~0.9.0-0",
@@ -22,15 +21,19 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "dodo": "0.0.5",
+    "dodo": "0.0.6",
     "express": "^4.14.0",
-    "knex": "^0.11.7",
-    "mocha": "^2.5.3",
-    "objection": "^0.5.2",
-    "pg": "^6.0.1",
-    "sinon": "^1.17.4"
+    "knex": "0.12.1",
+    "mocha": "^3.1.0",
+    "npm-check": "^5.2.3",
+    "nsp": "^2.6.1",
+    "objection": "^0.6.0-rc.6",
+    "pg": "^6.1.0",
+    "pg-escape": "^0.2.0",
+    "sinon": "^1.17.6"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha --slow 10 --timeout 5000 --reporter spec --recursive tests"
+    "test": "node_modules/.bin/mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
+    "check": "node_modules/.bin/npm-check; node_modules/.bin/nsp check"
   }
 }
