@@ -108,22 +108,13 @@ module.exports = function(app, config) {
     return database(fakeReq);
   };
 
-  app.knex = function (fakeReq) {
-    log.warning("app.knex() API is going to be deprecated, please use app.feature('objection').knex()");
-    return feature.knex(fakeReq);
-  };
-
   feature.disconnectKnex = function () {
     var dbs = databases;
     databases = {};
+    // TODO: probably this should also destroy dbManager connections
     return Promise.all(_.map(dbs, function (knex) {
       return knex.destroy();
     }));
-  };
-
-  app.disconnectKnex = function () {
-    log.warning("app.disconnectKnex() API is going to be deprecated, please use app.feature('objection').disconnectKnex()");
-    return feature.disconnectKnex();
   };
 
   // bind models...
@@ -139,11 +130,6 @@ module.exports = function(app, config) {
     // Throws if the database configuration is request specific.
     // See ConfigManager.knexConfig for more info.
     return bindModels(feature.knex(fakeReq));
-  };
-
-  app.models = function (fakeReq) {
-    log.warning("app.models() API is going to be deprecated, please use app.feature('objection').models()");
-    return feature.models(fakeReq);
   };
 
   app.use(function(req, res, next) {
