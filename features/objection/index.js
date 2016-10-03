@@ -93,7 +93,7 @@ module.exports = function(app, config) {
 
   // database manager for handling administration stuff...
   feature.dbManager = function (fakeReq) {
-    return dbManagersCache(fakeReq);
+    return dbManagerCache(fakeReq);
   }
 
   /**
@@ -127,7 +127,7 @@ module.exports = function(app, config) {
   };
 
   // bind models...
-  var modelModules = findModelClassModules(app, config);
+  var modelModules = findModelClassModules(app, getDbConfig(config, {}));
 
   /**
    * Get bound models through app
@@ -147,8 +147,9 @@ module.exports = function(app, config) {
   };
 
   app.use(function(req, res, next) {
-    req.knex = database(req);
-    req.models = bindModels(req.knex);
+    req.knex = feature.knex(req);
+    req.models = feature.models(req);
+    req.dbManager = feature.dbManager(req);
     next();
   });
 
