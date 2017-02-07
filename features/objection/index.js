@@ -2,12 +2,12 @@
 
 var _ = require('lodash')
   , Promise = require('bluebird')
-  , multiRequire = require('dodo/lib/utils/multi-require')
-  , classUtils = require('dodo/lib/utils/class-utils')
+  , multiRequire = require('dodo/utils').multiRequire
+  , classUtils = require('dodo/utils').classUtils
   , Model = require('objection').Model
   , knex = require('knex')
   , color = require('cli-color')
-  , log = require('dodo/lib/logger').getLogger('dodo-objection.feature')
+  , log = require('dodo/logger').getLogger('dodo-objection.feature')
   , createDbManager = require('knex-db-manager').databaseManagerFactory;
 
 /**
