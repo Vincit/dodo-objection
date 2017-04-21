@@ -2,6 +2,8 @@
 
 # Objection.js plugin for Dodo.js Framework
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Vincit/dodo-objection.svg)](https://greenkeeper.io/)
+
 ## Installation
 
 ## Configuration
