@@ -16,7 +16,7 @@
   },
   "peerDependencies": {
     "objection": "^0.7.1",
-    "knex": "^0.12",
+    "knex": "^0.13.0",
     "dodo": "^0.0.14"
   },
   "devDependencies": {
