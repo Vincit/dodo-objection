@@ -65,7 +65,7 @@ describe('Feature initialization with static config', function () {
     // test later that knex connection actually works (use db manager to setup DB first)
     expect(next.calledOnce).to.be.ok;
     expect(mockReq.models).to.eql({});
-    expect('' +  mockReq.knex).to.contain('function knex(tableName)'); // nasty check that it really is knex
+    expect(mockReq.knex.makeKnex).to.be.function; // nasty check that it really is knex
     expect(mockReq.dbManager).to.be.ok;
   });
 
