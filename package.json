@@ -15,15 +15,15 @@
     "lodash": "^4.16.2"
   },
   "peerDependencies": {
-    "objection": "^0.7.1",
-    "knex": "^0.12",
-    "dodo": "^0.0.14"
+    "objection": ">=0.8",
+    "knex": ">=0.12",
+    "dodo": ">=0.0.14"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "dodo": "0.0.14",
     "express": "^4.14.0",
-    "knex": "0.12.6",
+    "knex": "0.13.0",
     "mocha": "^3.1.0",
     "npm-check": "^5.2.3",
     "nsp": "^2.6.1",
