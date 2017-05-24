@@ -1,11 +1,9 @@
-var Model = require('objection').Model;
+'use strict';
 
-function Model1() {
-  Model.apply(this, arguments);
+const Model = require('objection').Model;
+
+class Model1 extends Model {
+  static get tableName() { return 'Model1'; }
 }
-
-Model.extend(Model1);
-
-Model1.tableName = 'Model1';
 
 module.exports = Model1;
