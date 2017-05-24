@@ -1,7 +1,7 @@
 {
   "name": "dodo-objection",
   "description": "Objection.js ORM plugin for Dodo.js framework",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "author": {
     "name": "Mikael Lepistö",
