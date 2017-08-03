@@ -30,7 +30,7 @@
     "objection": "^0.8.0",
     "pg": "^6.1.0",
     "pg-escape": "^0.2.0",
-    "sinon": "^2.0.0"
+    "sinon": "^3.0.0"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
