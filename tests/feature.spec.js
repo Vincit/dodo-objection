@@ -138,7 +138,7 @@ describe('integration', function () {
   it('should be able to run migrations and bind models for 2 databases', function () {
     var mockRequest1 = { database: 'dodo-objection-test-1' };
     var mockRequest2 = { database: 'dodo-objection-test-2' };
-    
+
     var manager1 = feature.dbManager(mockRequest1);
     var manager2 = feature.dbManager(mockRequest2);
 
@@ -168,7 +168,7 @@ describe('integration', function () {
         })
         .then(function () {
           return feature.models(mockRequest2).Model2.query().insert({});
-        })        
+        })
     ]).then(function () {
       var db1Knex = feature.knex(mockRequest1);
       var db2Knex = feature.knex(mockRequest2);
@@ -188,7 +188,7 @@ describe('integration', function () {
         }),
       ]);
     });
-  });  
+  });
 
   it('should close all DB connections', function () {
     var mockRequest1 = { database: 'dodo-objection-test-1' };
@@ -215,6 +215,110 @@ describe('integration', function () {
             expect(err.message).to.contain('Unable to acquire a connection');
           });
       });
+  });
+
+  describe('running tasks', () => {
+    let config = opts => {
+      return {
+        knex: {
+          client: 'postgres',
+          debug: false,
+          connection: {
+            host: process.env.POSTGRES_HOST || 'localhost',
+            port: process.env.POSTGRES_PORT || 5432,
+            database: opts.dbName || 'dodoobjtestdb',
+            user: process.env.POSTGRES_USER || 'dodoobjtestuser',
+            password: process.env.POSTGRES_USER_PW || undefined
+          },
+          migrations: {
+            tableName: 'migrations',
+            directory: opts.migrationDir || path.join(__dirname, 'migrations')
+          }
+        },
+        dbManager: {
+          superUser: process.env.POSTGRES_SUPERUSER || 'postgres',
+          superPassword: process.env.POSTGRES_SUPERUSER_PW || undefined
+        }
+      };
+    };
+
+    let tasks;
+    let dbManager;
+
+    before(() => {
+      tasks = _.keyBy(feature.constructor.tasks, 'name');
+      console.log(feature.dbManager);
+      dbManager = feature.dbManager({ database: 'dodomigrationsteaskcreateddb' });
+      return dbManager.dropDb();
+    });
+
+    it('should create new migration to service relative path', () => {
+      return Promise.resolve(tasks['new-migration'].run(
+        config({
+          migrationDir: './tempMigrations'
+        }),
+        {},
+        __dirname
+      )).then(res => {
+        expect(path.dirname(res.createdFile)).to.equal(`${__dirname}/tempMigrations`);
+      });
+    });
+
+    it('should create new migration to absolute path', () => {
+      return Promise.resolve(tasks['new-migration'].run(
+        config({
+          migrationDir: `${__dirname}/tempMigrations`
+        }),
+        {},
+        'whatever'
+      )).then(res => {
+        expect(path.dirname(res.createdFile)).to.equal(`${__dirname}/tempMigrations`);
+      });
+    });
+
+    it('should call create db', () => {
+      return Promise.resolve(tasks['db-create'].run(
+        config({
+          dbName: 'dodomigrationsteaskcreateddb'
+        }),
+        {},
+        'whatever'
+      ))
+      .then(res => {
+        const knex = dbManager.knexInstance();
+        return dbManager.knexInstance().select(knex.raw('1 as foo'));
+      })
+      .then(res => dbManager.closeKnex().return(res)) // tap
+      .then(res => {
+        expect(res[0].foo).to.equal(1);
+      });
+    });
+
+    it('should call migrate db', () => {
+      return Promise.resolve(tasks['db-migrate'].run(
+        config({
+          dbName: 'dodomigrationsteaskcreateddb',
+          migrationDir: `${__dirname}/migrations`
+        }),
+        {},
+        __dirname
+      )).then(res => {
+        expect(res).to.have.length(2);
+      });
+    });
+
+    it('should call drop db', function () {
+      this.timeout(100000);
+      return Promise.resolve(tasks['db-drop'].run(
+        config({
+          dbName: 'dodomigrationsteaskcreateddb'
+        }),
+        {},
+        'whatever'
+      )).then(res => {
+        expect(res.command).to.equal('DROP');
+      });
+    });
   });
 
   it.skip('should support mysql!', function () {

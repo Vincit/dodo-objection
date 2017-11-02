@@ -160,8 +160,10 @@ module.exports.tasks = [{
   run: function (featureConfig, serviceConfig, servicePath) {
     const dbManager = createDbManager(featureConfig);
     return dbManager.createDb()
-      .then(() => dbManager.close())
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
       .catch(err => {
+        dbManager.closeKnex();
         dbManager.close();
         throw err;
       });
@@ -173,8 +175,10 @@ module.exports.tasks = [{
   run: function (featureConfig, serviceConfig, servicePath) {
     const dbManager = createDbManager(featureConfig);
     return dbManager.migrateDb()
-      .then(() => dbManager.close())
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
       .catch(err => {
+        dbManager.closeKnex();
         dbManager.close();
         throw err;
       });
@@ -186,8 +190,10 @@ module.exports.tasks = [{
   run: function (featureConfig, serviceConfig, servicePath) {
     const dbManager = createDbManager(featureConfig);
     return dbManager.dropDb()
-      .then(() => dbManager.close())
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
       .catch(err => {
+        dbManager.closeKnex();
         dbManager.close();
         throw err;
       });
@@ -200,7 +206,7 @@ module.exports.tasks = [{
     const migrationName = process.env.MIGRATION_NAME || 'new_migration';
     const currentUtc = moment().utc().format("YYYYMMDDHHmmss");
 
-    const configuredMigrationDir = featureConfig.knex.migrations.directory || 'migrations';
+    let configuredMigrationDir = featureConfig.knex.migrations.directory || 'migrations';
     configuredMigrationDir = configuredMigrationDir.startsWith('/') ?
       configuredMigrationDir :
       path.join(servicePath, configuredMigrationDir);
@@ -223,13 +229,17 @@ module.exports.tasks = [{
       "};"
     ];
 
-    fs.writeFile(migrationFileName, template.join("\n"), function(err) {
-      if (err) {
-        log.error({ error: err }, 'Could not write migration file.');
-      } else {
-        log.info(`Created new migration script: ${migrationFileName}`);
-      }
-    });
+    try {
+      fs.writeFileSync(migrationFileName, template.join("\n"));
+      log.debug(`Created new migration script: ${migrationFileName}`);
+    } catch (err) {
+      log.error({ error: err }, 'Could not write migration file.');
+      throw err;
+    }
+
+    return {
+      createdFile: migrationFileName
+    };
   },
   description: 'Creates new migration for the service, pass name is MIGRATION_NAME environment variable'
 
