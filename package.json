@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "dodo": "0.0.14",
+    "dodo": "0.0.15",
     "express": "^4.14.0",
     "knex": "0.13.0",
     "mocha": "^3.1.0",
