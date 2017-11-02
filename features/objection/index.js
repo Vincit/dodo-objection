@@ -8,6 +8,9 @@ var _ = require('lodash')
   , knex = require('knex')
   , color = require('cli-color')
   , log = require('dodo/logger').getLogger('dodo-objection.feature')
+  , moment = require('moment')
+  , path = require('path')
+  , fs = require('fs')
   , createDbManager = require('knex-db-manager').databaseManagerFactory;
 
 /**
@@ -151,6 +154,96 @@ module.exports = function(app, config) {
     return models;
   }
 };
+
+module.exports.tasks = [{
+  name: 'db-create',
+  run: function (featureConfig, serviceConfig, servicePath) {
+    const dbManager = createDbManager(featureConfig);
+    return dbManager.createDb()
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
+      .catch(err => {
+        dbManager.closeKnex();
+        dbManager.close();
+        throw err;
+      });
+  },
+  description: 'Creates database for the service (and owner user if necessary)'
+
+}, {
+  name: 'db-migrate',
+  run: function (featureConfig, serviceConfig, servicePath) {
+    const dbManager = createDbManager(featureConfig);
+    return dbManager.migrateDb()
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
+      .catch(err => {
+        dbManager.closeKnex();
+        dbManager.close();
+        throw err;
+      });
+  },
+  description: 'Runs migrations of the service'
+
+}, {
+  name: 'db-drop',
+  run: function (featureConfig, serviceConfig, servicePath) {
+    const dbManager = createDbManager(featureConfig);
+    return dbManager.dropDb()
+      .tap(res => dbManager.closeKnex())
+      .tap(res => dbManager.close())
+      .catch(err => {
+        dbManager.closeKnex();
+        dbManager.close();
+        throw err;
+      });
+  },
+  description: 'Drops database of the service'
+
+}, {
+  name: 'new-migration',
+  run: function (featureConfig, serviceConfig, servicePath) {
+    const migrationName = process.env.MIGRATION_NAME || 'new_migration';
+    const currentUtc = moment().utc().format("YYYYMMDDHHmmss");
+
+    let configuredMigrationDir = featureConfig.knex.migrations.directory || 'migrations';
+    configuredMigrationDir = configuredMigrationDir.startsWith('/') ?
+      configuredMigrationDir :
+      path.join(servicePath, configuredMigrationDir);
+
+    // TODO: add migration suffix + template to config
+    const migrationFileName = path.join(configuredMigrationDir, currentUtc + '_' + migrationName + '.js');
+
+    var template = [
+      "'use strict';",
+      "//var _ = require('lodash');",
+      "",
+      "// see http://knexjs.org/#Schema ",
+      "exports.up = function (knex) {",
+      "  return knex.schema.table('MyTable', function (table) {",
+      "    table.timestamp('createTime').notNullable().defaultTo(knex.raw('now()'));",
+      "  });",
+      "};",
+      "",
+      "exports.down = function (/* knex */) {",
+      "};"
+    ];
+
+    try {
+      fs.writeFileSync(migrationFileName, template.join("\n"));
+      log.debug(`Created new migration script: ${migrationFileName}`);
+    } catch (err) {
+      log.error({ error: err }, 'Could not write migration file.');
+      throw err;
+    }
+
+    return {
+      createdFile: migrationFileName
+    };
+  },
+  description: 'Creates new migration for the service, pass name is MIGRATION_NAME environment variable'
+
+}];
 
 /**
  * @private
