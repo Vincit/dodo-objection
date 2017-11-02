@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var ObjectionFeature = require('../features/objection');
 var expect = require('chai').expect;
@@ -91,7 +93,7 @@ describe('integration', function () {
   beforeEach(function () {
     mockApp = {};
 
-    configFunction = function (req) {
+    let configFunction = function (req) {
       return {
         // normal knex config to describe db connection for app
         knex: {
