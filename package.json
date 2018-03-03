@@ -13,7 +13,7 @@
     "cli-color": "^1.1.0",
     "knex-db-manager": "^0.4.0",
     "lodash": "^4.16.2",
-    "moment": "^2.19.1"
+    "moment": "2.20.1"
   },
   "peerDependencies": {
     "objection": ">=0.8",
