@@ -186,6 +186,21 @@ module.exports.tasks = [{
   description: 'Runs migrations of the service'
 
 }, {
+    name: 'db-populate',
+    run: function (featureConfig, serviceConfig, servicePath) {
+        const dbManager = createDbManager(featureConfig);
+        return dbManager.populateDb()
+            .tap(res => dbManager.closeKnex())
+            .tap(res => dbManager.close())
+            .catch(err => {
+                    dbManager.closeKnex();
+                dbManager.close();
+                throw err;
+            });
+    },
+    description: 'Runs populate of the service'
+
+}, {
   name: 'db-drop',
   run: function (featureConfig, serviceConfig, servicePath) {
     const dbManager = createDbManager(featureConfig);
