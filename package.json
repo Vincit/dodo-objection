@@ -9,7 +9,7 @@
     "url": "https://github.com/elhigu"
   },
   "dependencies": {
-    "bluebird": "^3.4.6",
+    "bluebird": "^3.5.2",
     "cli-color": "^1.1.0",
     "knex-db-manager": "^0.4.0",
     "lodash": "^4.16.2",
