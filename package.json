@@ -12,7 +12,7 @@
     "bluebird": "^3.4.6",
     "cli-color": "^1.1.0",
     "knex-db-manager": "^0.4.0",
-    "lodash": "^4.16.2",
+    "lodash": "4.17.11",
     "moment": "^2.19.1"
   },
   "peerDependencies": {
